@@ -14,7 +14,8 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.3.RELEASE</version>
+		<!--<version>2.0.3.RELEASE</version>-->
+		<version>2.1.4.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -43,8 +44,8 @@
 
 		<dependency>
 			<groupId>com.oracle</groupId>
-			<artifactId>ojdbc14</artifactId>
-			<version>10.2.0.4.0</version>
+			<artifactId>ojdbc6</artifactId>
+			<version>11.2.0.1.0</version>
 		</dependency>
 
 		<dependency>
@@ -63,7 +64,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.49</version>
+            <version>1.2.58</version>
         </dependency>
 
         <!-- commons jar包，Stringutils -->
@@ -89,6 +90,15 @@
 
 		</plugins>
 	</build>
+
+	<repositories>
+		<repository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/milestone</url>
+			<!--<url>http://192.168.10.229:9999/nexus/content/groups/public/</url>-->
+		</repository>
+	</repositories>
 
 
 </project>

@@ -27,7 +27,15 @@ public class DataBaseController {
     private DataTransport dataTransport ;
 
     private static Logger log = LoggerFactory.getLogger(DataBaseController.class);
-
+   /** 
+   * @Description: 从Oracle中复制表到mysql中
+   * @Param:  table 表名
+   * @Param: schema 表空间  (auth 用户表空间AUTH)
+   * @Param: oridb 数据库连接信息
+   * @return:  String
+   * @Author: sunyulong 
+   * @Date: 2019/11/22 
+   */
     @RequestMapping("/table")
     public String tableTransport(@RequestParam(defaultValue = "*") String table,@RequestParam(defaultValue = "UAPDB")String schema,@RequestParam(defaultValue = "dataSource" )String oridb){
         log.info("table = " + table);
@@ -37,7 +45,32 @@ public class DataBaseController {
             return "oracle 转mysql 表结果出错";
         }
     }
-
+    /** 
+    * @Description: 查询oracle中用户的表空间 
+    * @Param:  
+    * @return:  
+    * @Author: sunyulong 
+    * @Date: 2019/11/22 
+    */
+    @RequestMapping("/schemas")
+    public String schemasTransport(@RequestParam(defaultValue = "*") String table,@RequestParam(defaultValue = "UAPDB")String schema,@RequestParam(defaultValue = "dataSource" )String oridb){
+        log.info("table = " + table);
+        try{
+            tableTransport.getSchemasInfo(oridb);
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
+        return  "";
+    }
+   /** 
+   * @Description: 从oracle数据库中复制数据到mysql
+   * @Param:  table 表名
+   * @Param: schema 表空间  (auth 用户表空间AUTH)
+   * @Param: oridb 数据库连接信息
+   * @return:  String
+   * @Author: sunyulong
+   * @Date: 2019/11/22
+   */
     @RequestMapping("/data")
     public String dataTransport(@RequestParam(defaultValue = "*") String table,@RequestParam(defaultValue = "UAPDB")String schema,@RequestParam(defaultValue = "dataSource" )String oridb){
         List<TableInfo> list = tableTransport.getTablesList(oridb,schema,table);

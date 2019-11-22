@@ -61,7 +61,8 @@ public class JdbcUtilServices {
         return true;
     }
     @Transactional
-    public int[] batchInsert(String inDataSource,String targetTable , List<Map<String,Object>> valueList){
+    public int[] batchInsert(String inDataSource,String targetTable ,final  List<Map<String,Object>> valueList){
+      //  final  List<Map<String,Object>>   valueList1 =  valueList;
         if(null == valueList || valueList.isEmpty()){
             log.info("准备插入数到+"+inDataSource+",table ="+targetTable+",数量为空,不执行插入");
             return null;
@@ -71,7 +72,7 @@ public class JdbcUtilServices {
 
         StringBuffer paramSb= new StringBuffer();
         Map<String,Object> oneMap = valueList.get(0);
-        Object[] keys = oneMap.keySet().toArray();
+       final Object[] keys = oneMap.keySet().toArray();
         for (int i = 0; i < keys.length; i++) {
             if(i == 0 ){
                 insertSql.append(keys[i]);

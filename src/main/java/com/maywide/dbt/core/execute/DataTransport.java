@@ -8,7 +8,7 @@ import com.maywide.dbt.core.pojo.oracle.TableInfo;
 import com.maywide.dbt.core.services.JdbcUtilServices;
 import com.maywide.dbt.util.SpringJdbcTemplate;
 import com.maywide.dbt.util.SqlUtil;
-import org.apache.tomcat.util.threads.ThreadPoolExecutor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -38,7 +39,7 @@ public class DataTransport {
 //            new LinkedBlockingDeque<>(DataTransport.WORK_QUE_SIZE),new ThreadPoolExecutor.CallerRunsPolicy());
 
     public static ThreadPoolExecutor dataCopyPoolExecutor = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors() * 10 + 1, Runtime.getRuntime().availableProcessors() * 15+ 1, 30, TimeUnit.SECONDS,
-            new LinkedBlockingDeque<>(DataTransport.WORK_QUE_SIZE),new ThreadPoolExecutor.CallerRunsPolicy());
+           new LinkedBlockingDeque<Runnable>(DataTransport.WORK_QUE_SIZE));
 
     @Autowired
     private SpringJdbcTemplate springJdbcTemplate ;

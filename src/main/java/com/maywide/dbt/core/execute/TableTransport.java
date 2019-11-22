@@ -99,7 +99,7 @@ public class TableTransport {
             rs = dbmd.getSchemas();
             while (rs.next()){
                 String tableSchem = rs.getString("TABLE_SCHEM");
-                //System.out.println(tableSchem);
+                System.out.println(tableSchem);
             }
         } catch (SQLException e){
             e.printStackTrace();
@@ -215,7 +215,7 @@ public class TableTransport {
                 String tableName = rs.getString("TABLE_NAME");  //表名
                 String tableType = rs.getString("TABLE_TYPE");  //表类型
                 String remarks = rs.getString("REMARKS");       //表备注
-                //System.out.println(tableName + " - " + tableType + " - " + remarks);
+                System.out.println(tableName + " - " + tableType + " - " + remarks);
                 table.setREMARKS(remarks);
                 table.setTABLE_NAME(tableName);
                 table.setTABLE_TYPE(tableType);
