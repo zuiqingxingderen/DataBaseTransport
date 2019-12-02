@@ -1,8 +1,8 @@
 package com.maywide.dbt.core.pojo.oracle;
 
 public class PrimaryKey {
-    private String TABLE_NAME ;//表
-    private String COLUMN_NAME ;//列
+    private String TABLE_NAME;//表
+    private String COLUMN_NAME;//列
     private short KEY_SEQ;//序列
     private String PK_NAME;//主键名
 

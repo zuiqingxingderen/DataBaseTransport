@@ -10,7 +10,7 @@ public class TableUtil {
      * @param day
      * @return
      */
-    public static String getDayTableName(String tableName,Date day) {
+    public static String getDayTableName(String tableName, Date day) {
         return tableName + "_" + DateUtils.formatDate(day, DateUtils.FORMAT_YYYYMMDD);
     }
 
@@ -20,6 +20,6 @@ public class TableUtil {
      * @return
      */
     public static String getYesterdayTableName(String tableName) {
-        return TableUtil.getDayTableName(tableName,DateUtils.getYesterday());
+        return TableUtil.getDayTableName(tableName, DateUtils.getYesterday());
     }
 }

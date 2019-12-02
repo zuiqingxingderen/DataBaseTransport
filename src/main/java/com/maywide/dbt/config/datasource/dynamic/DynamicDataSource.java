@@ -39,10 +39,11 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
 
 
     @Autowired
-    private Environment env ;
+    private Environment env;
+
     /**
-     * @see org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource#determineCurrentLookupKey()
      * @describe 数据源为空或者为0时，自动切换至默认数据源，即在配置文件中定义的dataSource数据源
+     * @see org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource#determineCurrentLookupKey()
      */
     @Override
     protected Object determineCurrentLookupKey() {
@@ -58,7 +59,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
 
     @Override
     public void afterPropertiesSet() {
-        if(null ==_targetDataSources){
+        if (null == _targetDataSources) {
             this._targetDataSources = new HashMap<>();
             initDefaultDatasource(env);
             initOtherDatasource(env);
@@ -74,14 +75,14 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
      * @param env
      * @return
      */
-    private DataSource initDefaultDatasource(Environment env){
+    private DataSource initDefaultDatasource(Environment env) {
         String driverClassName = env.getProperty("spring.datasource.driverClassName");
         String url = env.getProperty("spring.datasource.url");
         String userName = env.getProperty("spring.datasource.username");
         String password = env.getProperty("spring.datasource.password");
         String dataSourceName = env.getProperty("spring.datasource.name");
-        DataSource dataSource = this.createDataSource(driverClassName, url, userName, password,dataSourceName);
-        this._targetDataSources.put(Constants.DEFAULT_DATA_SOURCE_NAME,dataSource);
+        DataSource dataSource = this.createDataSource(driverClassName, url, userName, password, dataSourceName);
+        this._targetDataSources.put(Constants.DEFAULT_DATA_SOURCE_NAME, dataSource);
         return dataSource;
     }
 
@@ -89,22 +90,22 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
      * 初始化 额外数据源
      * @param env
      */
-    private void initOtherDatasource(Environment env){
+    private void initOtherDatasource(Environment env) {
         log.info("初始化 数据库中配置的全部数据库连接");
         String prefix = "target.mysql.datasource";
-        String otherDbNames = env.getProperty(prefix+".names");
-        if(StringUtils.isEmpty(otherDbNames)){
+        String otherDbNames = env.getProperty(prefix + ".names");
+        if (StringUtils.isEmpty(otherDbNames)) {
             log.info("未配置其他数据源");
-            return ;
+            return;
         }
 
         for (String dbname : otherDbNames.split(",")) {
-            String driverClassName = env.getProperty(prefix+"."+dbname+".driverClassName");
-            String url = env.getProperty(prefix+"."+dbname+".url");
-            String userName = env.getProperty(prefix+"."+dbname+".username");
-            String password = env.getProperty(prefix+"."+dbname+".password");
-            DataSource dataSource = this.createDataSource(driverClassName, url, userName, password,dbname);
-            this._targetDataSources.put(dbname,dataSource);
+            String driverClassName = env.getProperty(prefix + "." + dbname + ".driverClassName");
+            String url = env.getProperty(prefix + "." + dbname + ".url");
+            String userName = env.getProperty(prefix + "." + dbname + ".username");
+            String password = env.getProperty(prefix + "." + dbname + ".password");
+            DataSource dataSource = this.createDataSource(driverClassName, url, userName, password, dbname);
+            this._targetDataSources.put(dbname, dataSource);
             DynamicDataSource.otherDataSource.add(dbname);
         }
     }
@@ -112,6 +113,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
 
     /**
      * 到数据库中查找名称为dataSourceName的数据源
+     *
      * @param dataSourceName
      */
     private void selectDataSource(String dataSourceName) {
@@ -151,7 +153,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
 //    }
 
     public DataSource createDataSource(String driverClassName, String url,
-                                        String username, String password,String dataSourceName) {
+                                       String username, String password, String dataSourceName) {
         DruidDataSource dataSource = new DruidDataSource();//(DruidDataSource) getMyDataSource();
         dataSource.configFromPropety(DuridConfig.getProperties());
         dataSource.setName(dataSourceName);
@@ -160,7 +162,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
         dataSource.setUsername(username);
         dataSource.setPassword(password);
         try {
-            System.out.println(env.getProperty("spring.datasource.","initial-size"));
+            System.out.println(env.getProperty("spring.datasource.", "initial-size"));
             System.out.println(env.getProperty("spring.datasource.initial-size"));
             dataSource.setFilters("stat,wall");
             dataSource.setMaxActive(80);
@@ -173,7 +175,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
             dataSource.setTimeBetweenEvictionRunsMillis(18800);
         } catch (SQLException e) {
             e.printStackTrace();
-            log.error(e.getMessage(),e);
+            log.error(e.getMessage(), e);
         }
         //dataSource.setInitialSize(5);
         return dataSource;
@@ -182,10 +184,10 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
     /**
      * 到数据库中查询名称为dataSourceName的数据源
      *
-     * @author Geloin
-     * @date Jan 20, 2014 12:18:12 PM
      * @param dataSourceName
      * @return
+     * @author Geloin
+     * @date Jan 20, 2014 12:18:12 PM
      */
     private DataSource getDataSource(String dataSourceName) {
         this.selectDataSource(Constants.DEFAULT_DATA_SOURCE_NAME);
@@ -213,7 +215,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
                             .getString("C_DRIVER_CLASS_NAME");
                     String name = rs.getString("C_NAME");
                     DataSource dataSource = this.createDataSource(
-                            driverClassName, url, userName, password,name);
+                            driverClassName, url, userName, password, name);
                     return dataSource;
                 } else {
                     // JNDI
@@ -241,6 +243,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
 
     /**
      * 将已存在的数据源存储到内存中
+     *
      * @param dataSourceName
      * @param dataSource
      */
@@ -252,13 +255,12 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
 
     public DataSource getAcuallyDataSource() {
         Object lookupKey = determineCurrentLookupKey();
-        if(null == lookupKey) {
+        if (null == lookupKey) {
             return this;
         }
         DataSource determineTargetDataSource = this.determineTargetDataSource();
-        return determineTargetDataSource==null ? this : determineTargetDataSource;
+        return determineTargetDataSource == null ? this : determineTargetDataSource;
     }
-
 
 
 }

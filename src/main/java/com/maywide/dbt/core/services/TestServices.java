@@ -17,12 +17,12 @@ public class TestServices {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public  String testOneService(){
+    public String testOneService() {
 
         String allDataBase = "select * from bi_data_source where c_name in ('61node1','60node2','60node1')";
         List<Map<String, Object>> dataSource = jdbcTemplate.queryForList(allDataBase);
         for (Map<String, Object> stringObjectMap : dataSource) {
-            if(stringObjectMap.containsKey("c_name")){
+            if (stringObjectMap.containsKey("c_name")) {
                 String c_name = (String) stringObjectMap.get("c_name");
                 System.out.println("数据库=" + c_name);
                 DbContextHolder.setDBType(c_name);
@@ -40,20 +40,20 @@ public class TestServices {
     }
 
 
-    public void testInsert(){
+    public void testInsert() {
 
         String maxId = " select max(id) from test_bi_sku";
         String inSql = " INSERT INTO `test_bi_sku` (`saleisid`, `skuid`, `fees`, `servid`, `stime`, `etime`) VALUES (?, ?, ?, ?, ?,?) ";
         String allDataBase = "select * from bi_data_source";
         List<Map<String, Object>> dataSource = jdbcTemplate.queryForList(allDataBase);
         for (Map<String, Object> stringObjectMap : dataSource) {
-            if(stringObjectMap.containsKey("c_name")){
+            if (stringObjectMap.containsKey("c_name")) {
                 String c_name = (String) stringObjectMap.get("c_name");
                 System.out.println("数据库=" + c_name);
                 DbContextHolder.setDBType(c_name);
-                Long maxid = jdbcTemplate.queryForObject(maxId,Long.class);
-                System.out.println("maxid = " + maxid );
-                jdbcTemplate.update(inSql,Math.random(),Math.random(),Math.random(),Math.random(),new Date(),new Date());
+                Long maxid = jdbcTemplate.queryForObject(maxId, Long.class);
+                System.out.println("maxid = " + maxid);
+                jdbcTemplate.update(inSql, Math.random(), Math.random(), Math.random(), Math.random(), new Date(), new Date());
                 List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from biz_sku");
                 System.out.println(JSONUtils.toJSONString(list));
             }

@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 public class SpringJdbcTemplate extends JdbcTemplate {
     @Override
     public DataSource getDataSource() {
-        DynamicDataSource router =  (DynamicDataSource) super.getDataSource();
+        DynamicDataSource router = (DynamicDataSource) super.getDataSource();
         DataSource acuallyDataSource = router.getAcuallyDataSource();
         return acuallyDataSource;
     }

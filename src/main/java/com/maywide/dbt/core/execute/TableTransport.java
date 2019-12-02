@@ -27,39 +27,40 @@ public class TableTransport {
     private SpringJdbcTemplate springJdbcTemplate;
 
     @Autowired
-    private DdlSqlServices sql ;
+    private DdlSqlServices sql;
 
     /**
      * 关闭连接
+     *
      * @param o
      */
-    public static void close(Object o){
-        if (o == null){
+    public static void close(Object o) {
+        if (o == null) {
             return;
         }
-        if (o instanceof ResultSet){
+        if (o instanceof ResultSet) {
             try {
-                ((ResultSet)o).close();
+                ((ResultSet) o).close();
             } catch (SQLException e) {
-                log.error(e.getMessage(),e);
+                log.error(e.getMessage(), e);
                 e.printStackTrace();
             }
-        } else if(o instanceof Statement){
+        } else if (o instanceof Statement) {
             try {
-                ((Statement)o).close();
+                ((Statement) o).close();
             } catch (SQLException e) {
                 e.printStackTrace();
-                log.error(e.getMessage(),e);
+                log.error(e.getMessage(), e);
             }
-        } else if (o instanceof Connection){
-            Connection c = (Connection)o;
+        } else if (o instanceof Connection) {
+            Connection c = (Connection) o;
             try {
-                if (!c.isClosed()){
+                if (!c.isClosed()) {
                     c.close();
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
-                log.error(e.getMessage(),e);
+                log.error(e.getMessage(), e);
             }
         }
     }
@@ -70,7 +71,7 @@ public class TableTransport {
      * @param stmt
      * @param conn
      */
-    public static void close(ResultSet rs, Statement stmt, Connection conn){
+    public static void close(ResultSet rs, Statement stmt, Connection conn) {
         close(rs);
         close(stmt);
         close(conn);
@@ -78,34 +79,36 @@ public class TableTransport {
 
     /**
      * 关闭连接
+     *
      * @param rs
      * @param conn
      */
-    public static void close(ResultSet rs, Connection conn){
+    public static void close(ResultSet rs, Connection conn) {
         close(rs);
         close(conn);
     }
 
     /**
      * 获得数据库中所有Schemas(对应于oracle中的Tablespace)
+     *
      * @param datasource
      * @throws SQLException
      */
-    public  void getSchemasInfo(String datasource) throws SQLException {
-        Connection conn =  this.getConnection(datasource);
+    public void getSchemasInfo(String datasource) throws SQLException {
+        Connection conn = this.getConnection(datasource);
         ResultSet rs = null;
-        try{
+        try {
             DatabaseMetaData dbmd = conn.getMetaData();
             rs = dbmd.getSchemas();
-            while (rs.next()){
+            while (rs.next()) {
                 String tableSchem = rs.getString("TABLE_SCHEM");
                 System.out.println(tableSchem);
             }
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
-            log.error(e.getMessage(),e);
-        } finally{
-            TableTransport.close(rs,conn);
+            log.error(e.getMessage(), e);
+        } finally {
+            TableTransport.close(rs, conn);
         }
     }
 
@@ -118,13 +121,13 @@ public class TableTransport {
      */
     private Connection getConnection(String dataSource) throws SQLException {
         DbContextHolder.setDBType(dataSource);
-       Connection conn = springJdbcTemplate.getDataSource().getConnection();
+        Connection conn = springJdbcTemplate.getDataSource().getConnection();
         if (conn instanceof DruidPooledConnection) {//设置Oracle数据库的表注释可读
             Connection cc = ((DruidPooledConnection) conn).getConnection();
-            if(cc instanceof ConnectionProxyImpl ){
+            if (cc instanceof ConnectionProxyImpl) {
                 ConnectionProxyImpl connectionProxy = (ConnectionProxyImpl) cc;
                 Connection c1 = connectionProxy.getConnectionRaw();
-                if(c1 instanceof  OracleConnection){
+                if (c1 instanceof OracleConnection) {
                     ((OracleConnection) c1).setRemarksReporting(true);
                 }
             }
@@ -136,19 +139,20 @@ public class TableTransport {
 
     /**
      * 获取数据库相关信息
+     *
      * @param datasource
      * @throws SQLException
      */
-    public  void getDataBaseInfo(String datasource) throws SQLException {
-        Connection conn =  getConnection(datasource);
+    public void getDataBaseInfo(String datasource) throws SQLException {
+        Connection conn = getConnection(datasource);
         ResultSet rs = null;
-        try{
+        try {
             DatabaseMetaData dbmd = conn.getMetaData();
-            System.out.println("数据库已知的用户: "+ dbmd.getUserName());
-            System.out.println("数据库的系统函数的逗号分隔列表: "+ dbmd.getSystemFunctions());
-            System.out.println("数据库的时间和日期函数的逗号分隔列表: "+ dbmd.getTimeDateFunctions());
-            System.out.println("数据库的字符串函数的逗号分隔列表: "+ dbmd.getStringFunctions());
-            System.out.println("数据库供应商用于 'schema' 的首选术语: "+ dbmd.getSchemaTerm());
+            System.out.println("数据库已知的用户: " + dbmd.getUserName());
+            System.out.println("数据库的系统函数的逗号分隔列表: " + dbmd.getSystemFunctions());
+            System.out.println("数据库的时间和日期函数的逗号分隔列表: " + dbmd.getTimeDateFunctions());
+            System.out.println("数据库的字符串函数的逗号分隔列表: " + dbmd.getStringFunctions());
+            System.out.println("数据库供应商用于 'schema' 的首选术语: " + dbmd.getSchemaTerm());
             System.out.println("数据库URL: " + dbmd.getURL());
             System.out.println("是否允许只读:" + dbmd.isReadOnly());
             System.out.println("数据库的产品名称:" + dbmd.getDatabaseProductName());
@@ -160,11 +164,11 @@ public class TableTransport {
             while (rs.next()) {
                 System.out.println(rs.getString("TABLE_TYPE"));
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
-            log.error(e.getMessage(),e);
-        } finally{
-            TableTransport.close(rs,conn);
+            log.error(e.getMessage(), e);
+        } finally {
+            TableTransport.close(rs, conn);
         }
     }
 
@@ -176,39 +180,64 @@ public class TableTransport {
      * @return
      * @throws SQLException
      */
-    public List<TableInfo> getTablesList(String datasource, String schema, String tableName)  {
+    public List<TableInfo> getTablesList(String datasource, String schema, String tableName) {
         List<TableInfo> list = null;
-        try{
-            if("*".equals(tableName)){
-                list = this.getTablesList(datasource,schema);
-            }else {
-                TableInfo tableInfo = this.getTable(datasource,schema,tableName);
-                if(null != tableInfo){
+        try {
+            if ("*".equals(tableName)) {
+                list = this.getTablesList(datasource, schema);
+            } else {
+                TableInfo tableInfo = this.getTable(datasource, schema, tableName);
+                if (null != tableInfo) {
                     list = new ArrayList<>();
                     list.add(tableInfo);
                 }
             }
-        }catch (SQLException se ){
-            log.error("获取表信息时出错:"+ se.getMessage(),se);
+        } catch (SQLException se) {
+            log.error("获取表信息时出错:" + se.getMessage(), se);
             list = null;
         }
-        return list ;
+        return list;
+    }
+
+    /***
+     * 获取表信息
+     * @param datasource
+     * @param schema
+     * @param tableArray 查询指定表的信息
+     * @return
+     * @throws SQLException
+     */
+    public List<TableInfo> getTablesList(String datasource, String schema, String[] tableArray) {
+        List<TableInfo> list = new ArrayList<>();
+        try {
+            for (String table : tableArray) {
+                TableInfo tableInfo = this.getTable(datasource, schema, table);
+                if (null != tableInfo) {
+                    list.add(tableInfo);
+                }
+            }
+        } catch (SQLException se) {
+            log.error("获取表信息时出错:" + se.getMessage(), se);
+            list = null;
+        }
+        return list;
     }
 
     /**
      * 获取数据库中所有的表信息
+     *
      * @param datasource
      * @param schema
      * @return
      * @throws SQLException
      */
-    public List<TableInfo> getTablesList(String datasource,String schema) throws SQLException {
+    public List<TableInfo> getTablesList(String datasource, String schema) throws SQLException {
         List<TableInfo> list = new ArrayList<>();
-        Connection conn =  this.getConnection(datasource);
+        Connection conn = this.getConnection(datasource);
         ResultSet rs = null;
         try {
             DatabaseMetaData dbmd = conn.getMetaData();
-            String[] types = { "TABLE"};
+            String[] types = {"TABLE"};
             rs = dbmd.getTables(null, schema, "%", types);
             while (rs.next()) {
                 TableInfo table = new TableInfo();
@@ -224,9 +253,9 @@ public class TableTransport {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            log.error(e.getMessage(),e);
-        } finally{
-            TableTransport.close(rs,conn);
+            log.error(e.getMessage(), e);
+        } finally {
+            TableTransport.close(rs, conn);
         }
         return list;
     }
@@ -240,13 +269,13 @@ public class TableTransport {
      * @return
      * @throws SQLException
      */
-    public TableInfo getTable(String datasource,String schema,String tableName) throws SQLException {
+    public TableInfo getTable(String datasource, String schema, String tableName) throws SQLException {
         TableInfo table = null;
-        Connection conn =  this.getConnection(datasource);
+        Connection conn = this.getConnection(datasource);
         ResultSet rs = null;
         try {
             DatabaseMetaData dbmd = conn.getMetaData();
-            String[] types = { "TABLE"};
+            String[] types = {"TABLE"};
             rs = dbmd.getTables(null, schema, tableName, types);
             while (rs.next()) {
                 table = new TableInfo();
@@ -260,9 +289,9 @@ public class TableTransport {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            log.error(e.getMessage(),e);
-        } finally{
-            TableTransport.close(rs,conn);
+            log.error(e.getMessage(), e);
+        } finally {
+            TableTransport.close(rs, conn);
         }
         return table;
     }
@@ -284,25 +313,25 @@ public class TableTransport {
      * @param table
      * @return
      */
-    public  boolean execute(String schema,String datasource,String table){
-        boolean flag  = false;
+    public boolean execute(String schema, String datasource, String table) {
+        boolean flag = false;
         try {
-            if("*".equals(table)){
+            if ("*".equals(table)) {
                 log.info("开始加载表信息");
-                List<TableInfo> list = this.getTablesList(datasource,schema);
+                List<TableInfo> list = this.getTablesList(datasource, schema);
 
-                if(null != list && !list.isEmpty()){
-                    log.info("UAPDB 下的全部数据库数 :" +list.size() );
+                if (null != list && !list.isEmpty()) {
+                    log.info("UAPDB 下的全部数据库数 :" + list.size());
                     for (TableInfo tableInfo : list) {
 
                         log.info("开始加载某个主键信息");
-                        tableInfo.setPrimaryKeyList(this.getPrimaryKeysInfo(datasource,tableInfo.getSECHEMA(),tableInfo.getTABLE_NAME()));
+                        tableInfo.setPrimaryKeyList(this.getPrimaryKeysInfo(datasource, tableInfo.getSECHEMA(), tableInfo.getTABLE_NAME()));
 
                         log.info("开始加载某个表索引信息");
-                        tableInfo.setIndexInfoList(this.getIndexInfo(datasource,tableInfo.getSECHEMA(),tableInfo.getTABLE_NAME()));
+                        tableInfo.setIndexInfoList(this.getIndexInfo(datasource, tableInfo.getSECHEMA(), tableInfo.getTABLE_NAME()));
 
                         log.info("开始加载某个表列信息");
-                        tableInfo.setColumnInfoList(this.getColumnsInfo(datasource,tableInfo.getSECHEMA(),tableInfo.getTABLE_NAME()));
+                        tableInfo.setColumnInfoList(this.getColumnsInfo(datasource, tableInfo.getSECHEMA(), tableInfo.getTABLE_NAME()));
 
                         log.info(tableInfo.toString());
                     }
@@ -310,28 +339,28 @@ public class TableTransport {
                     log.info("开始建MYSQL 数据库表");
                     for (String mysqlDb : DynamicDataSource.otherDataSource) {
                         for (TableInfo tableInfo : list) {
-                            sql.execute(mysqlDb,tableInfo);
+                            sql.execute(mysqlDb, tableInfo);
                         }
                     }
-                    flag =true;
-                }else {
-                    log.warn("数据{"+datasource+"},schema{"+schema+"}中没有任何表信息");
-                    flag =false;
+                    flag = true;
+                } else {
+                    log.warn("数据{" + datasource + "},schema{" + schema + "}中没有任何表信息");
+                    flag = false;
                 }
-            }else {
-                TableInfo tableInfo = this.initTable(datasource,schema,table);
-                if(null != tableInfo){
+            } else {
+                TableInfo tableInfo = this.initTable(datasource, schema, table);
+                if (null != tableInfo) {
                     for (String mysqlDb : DynamicDataSource.otherDataSource) {
-                        this.copyTableToMySql(mysqlDb,tableInfo);
+                        this.copyTableToMySql(mysqlDb, tableInfo);
                     }
                     flag = true;
-                }else {
+                } else {
                     log.error("没有找到指定的table，退出了");
                     flag = false;
                 }
             }
         } catch (SQLException e) {
-            log.error("oracle 表 迁移 到mysql 表过程报错:"+e.getMessage(),e);
+            log.error("oracle 表 迁移 到mysql 表过程报错:" + e.getMessage(), e);
             flag = false;
         }
         return flag;
@@ -342,16 +371,16 @@ public class TableTransport {
      * @param datasource
      * @param schema
      */
-    public boolean transprotOracleSeqToMysqlTable(String datasource,String schema) {
+    public boolean transprotOracleSeqToMysqlTable(String datasource, String schema) {
         log.info("处理表的序列问题");
         //oracle序列可以转id 自增长;这里的逻辑不转自增长，转成 表存序列
-        List<SequenceInfo> seqList =this.getSchemaSeqInfo(datasource,schema);
+        List<SequenceInfo> seqList = this.getSchemaSeqInfo(datasource, schema);
 
         //开始执行 mysql 建表
         log.info("开始将oracle 序列 转换为 mysql 数据库表");
         for (String mysqlDb : DynamicDataSource.otherDataSource) {
             //建立序列表
-            sql.executeSeqTable(mysqlDb,seqList);
+            sql.executeSeqTable(mysqlDb, seqList);
         }
         return true;
     }
@@ -363,24 +392,24 @@ public class TableTransport {
      * @param schema
      * @return
      */
-    private List<SequenceInfo> getSchemaSeqInfo(String datasource,String schema){
+    private List<SequenceInfo> getSchemaSeqInfo(String datasource, String schema) {
 
         String seqSql = " select sequence_name,last_number from user_sequences";
         DbContextHolder.setDBType(datasource);
-        List<Map<String,Object>> list = springJdbcTemplate.queryForList(seqSql);
+        List<Map<String, Object>> list = springJdbcTemplate.queryForList(seqSql);
         List<SequenceInfo> seqList = new ArrayList<>(list.size());
-        if(null != list && !list.isEmpty()){
+        if (null != list && !list.isEmpty()) {
             for (Map<String, Object> oneResult : list) {
                 String seqName = (String) oneResult.get("sequence_name");
                 BigDecimal db_max = (BigDecimal) oneResult.get("last_number");
-                long max =db_max.longValue();
-                SequenceInfo  seq = new SequenceInfo();
+                long max = db_max.longValue();
+                SequenceInfo seq = new SequenceInfo();
                 seq.setOracleSeqName(seqName);
                 seq.setMaxValue(max);
                 seqList.add(seq);
             }
-        }else{
-            log.error("获取的序列为空,数据库={"+datasource+"}, schema = {"+schema+"}");
+        } else {
+            log.error("获取的序列为空,数据库={" + datasource + "}, schema = {" + schema + "}");
         }
         return seqList;
     }
@@ -392,26 +421,26 @@ public class TableTransport {
      * @param tableName    表明
      * @return
      */
-    public  boolean  validateTableNameExistByCon(String inDataSource,String tableName) {
+    public boolean validateTableNameExistByCon(String inDataSource, String tableName) {
         DbContextHolder.setDBType(inDataSource);
         boolean isExist = false;
         Connection con = null;
-        ResultSet rs =null;
+        ResultSet rs = null;
         try {
             con = this.springJdbcTemplate.getDataSource().getConnection();
             rs = con.getMetaData().getTables(null, null, tableName, null);
             if (rs.next()) {
-                isExist =  true;
+                isExist = true;
             } else {
-                isExist =  false;
+                isExist = false;
             }
         } catch (SQLException e) {
-            log.info(e.getMessage(),e);
+            log.info(e.getMessage(), e);
             e.printStackTrace();
-        }finally {
-            TableTransport.close(rs,con);
+        } finally {
+            TableTransport.close(rs, con);
         }
-        log.info("判断表存在 - 表 "+tableName +"在不在 数据库["+inDataSource+"]中 = 【"+isExist+"】");
+        log.info("判断表存在 - 表 " + tableName + "在不在 数据库[" + inDataSource + "]中 = 【" + isExist + "】");
         return isExist;
     }
 //
@@ -545,13 +574,13 @@ public class TableTransport {
         try {
             DatabaseMetaData dbmd = conn.getMetaData();
             *//**
-             * 获取给定类别中使用的表的描述。
-             * 方法原型:ResultSet getTables(String catalog,String schemaPattern,String tableNamePattern,String[] types);
-             * catalog - 表所在的类别名称;""表示获取没有类别的列,null表示获取所有类别的列。
-             * schema - 表所在的模式名称(oracle中对应于Tablespace);""表示获取没有模式的列,null标识获取所有模式的列; 可包含单字符通配符("_"),或多字符通配符("%");
-             * tableNamePattern - 表名称;可包含单字符通配符("_"),或多字符通配符("%");
-             * types - 表类型数组; "TABLE"、"VIEW"、"SYSTEM TABLE"、"GLOBAL TEMPORARY"、"LOCAL TEMPORARY"、"ALIAS" 和 "SYNONYM";null表示包含所有的表类型;可包含单字符通配符("_"),或多字符通配符("%");
-             *//*
+     * 获取给定类别中使用的表的描述。
+     * 方法原型:ResultSet getTables(String catalog,String schemaPattern,String tableNamePattern,String[] types);
+     * catalog - 表所在的类别名称;""表示获取没有类别的列,null表示获取所有类别的列。
+     * schema - 表所在的模式名称(oracle中对应于Tablespace);""表示获取没有模式的列,null标识获取所有模式的列; 可包含单字符通配符("_"),或多字符通配符("%");
+     * tableNamePattern - 表名称;可包含单字符通配符("_"),或多字符通配符("%");
+     * types - 表类型数组; "TABLE"、"VIEW"、"SYSTEM TABLE"、"GLOBAL TEMPORARY"、"LOCAL TEMPORARY"、"ALIAS" 和 "SYNONYM";null表示包含所有的表类型;可包含单字符通配符("_"),或多字符通配符("%");
+     *//*
             rs = dbmd.getTables(null, null, tablename, new String[]{"TABLE"});
 
             while(rs.next()){
@@ -573,17 +602,18 @@ public class TableTransport {
 
     /**
      * 获取表主键信息
+     *
      * @param datasource
      * @param sechema
      * @param tablename
      * @return
      * @throws SQLException
      */
-    public  List<PrimaryKey> getPrimaryKeysInfo(String datasource, String sechema, String tablename) throws SQLException {
+    public List<PrimaryKey> getPrimaryKeysInfo(String datasource, String sechema, String tablename) throws SQLException {
         List<PrimaryKey> list = new ArrayList<>();
-        Connection conn =  this.getConnection(datasource);
+        Connection conn = this.getConnection(datasource);
         ResultSet rs = null;
-        try{
+        try {
             DatabaseMetaData dbmd = conn.getMetaData();
             /**
              * 获取对给定表的主键列的描述
@@ -594,7 +624,7 @@ public class TableTransport {
              */
             rs = dbmd.getPrimaryKeys(null, sechema, tablename);
 
-            while (rs.next()){
+            while (rs.next()) {
                 PrimaryKey pk = new PrimaryKey();
                 String tableCat = rs.getString("TABLE_CAT");  //表类别(可为null)
                 String tableSchemaName = rs.getString("TABLE_SCHEM");//表模式（可能为空）,在oracle中获取的是命名空间,其它数据库未知
@@ -611,28 +641,29 @@ public class TableTransport {
                 pk.setPK_NAME(pkName);
                 list.add(pk);
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
-            log.error(e.getMessage(),e);
-        }finally{
-            TableTransport.close(rs,conn);
+            log.error(e.getMessage(), e);
+        } finally {
+            TableTransport.close(rs, conn);
         }
         return list;
     }
 
     /**
      * 获取表序列
+     *
      * @param datasource
      * @param sechema
      * @param tablename
      * @return
      * @throws SQLException
      */
-    public  List<IndexInfo> getIndexInfo(String datasource, String sechema, String tablename) throws SQLException {
+    public List<IndexInfo> getIndexInfo(String datasource, String sechema, String tablename) throws SQLException {
         List<IndexInfo> list = new ArrayList<>();
-        Connection conn =  this.getConnection(datasource);
+        Connection conn = this.getConnection(datasource);
         ResultSet rs = null;
-        try{
+        try {
             DatabaseMetaData dbmd = conn.getMetaData();
             /**
              * 获取给定表的索引和统计信息的描述
@@ -644,7 +675,7 @@ public class TableTransport {
              * approximate - 该参数为true时,允许结果是接近的数据值或这些数据值以外的值;该参数为 false时,要求结果是精确结果;
              */
             rs = dbmd.getIndexInfo(null, sechema, tablename, false, true);
-            while (rs.next()){
+            while (rs.next()) {
                 String tableCat = rs.getString("TABLE_CAT");  //表类别(可为null)
                 String tableSchemaName = rs.getString("TABLE_SCHEM");//表模式（可能为空）,在oracle中获取的是命名空间,其它数据库未知
                 String tableName = rs.getString("TABLE_NAME");  //表名
@@ -671,7 +702,7 @@ public class TableTransport {
                         + " - " + ascOrDesc + " - " + cardinality + " - " + pages + " - " + filterCondition);
 */
                 //过滤掉 type 为 0 column 为null 的索引
-                if(0 == type && (columnName == null || columnName.equals("null"))){
+                if (0 == type && (columnName == null || columnName.equals("null"))) {
                     continue;
                 }
                 IndexInfo indexInfo = new IndexInfo();
@@ -680,29 +711,30 @@ public class TableTransport {
                 indexInfo.setNON_UNIQUE(nonUnique);
                 list.add(indexInfo);
             }
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
-            log.error(e.getMessage(),e);
-        } finally{
-            TableTransport.close(rs,conn);
+            log.error(e.getMessage(), e);
+        } finally {
+            TableTransport.close(rs, conn);
         }
         return list;
     }
 
     /**
      * 获取表的列信息
+     *
      * @param datasource
      * @param schema
      * @param tablename
      * @return
      * @throws SQLException
      */
-    public  List<ColumnInfo> getColumnsInfo(String datasource, String schema, String tablename) throws SQLException {
+    public List<ColumnInfo> getColumnsInfo(String datasource, String schema, String tablename) throws SQLException {
         List<ColumnInfo> list = new ArrayList<>();
-        Connection conn =  this.getConnection(datasource);
+        Connection conn = this.getConnection(datasource);
         ResultSet rs = null;
 
-        try{
+        try {
             /**
              * 设置连接属性,使得可获取到列的REMARK(备注)
              */
@@ -715,9 +747,9 @@ public class TableTransport {
              * tableNamePattern - 表名称;可包含单字符通配符("_"),或多字符通配符("%");
              * columnNamePattern - 列名称; ""表示获取列名为""的列(当然获取不到);null表示获取所有的列;可包含单字符通配符("_"),或多字符通配符("%");
              */
-            rs =dbmd.getColumns(null, schema, tablename, null);
+            rs = dbmd.getColumns(null, schema, tablename, null);
 
-            while(rs.next()){
+            while (rs.next()) {
                 String tableCat = rs.getString("TABLE_CAT");  //表类别（可能为空）
                 String tableSchemaName = rs.getString("TABLE_SCHEM");  //表模式（可能为空）,在oracle中获取的是命名空间,其它数据库未知
                 String tableName_ = rs.getString("TABLE_NAME");  //表名
@@ -773,10 +805,10 @@ public class TableTransport {
                 columnInfo.setIS_NULLABLE(isNullAble);
                 list.add(columnInfo);
             }
-        }catch(SQLException ex){
+        } catch (SQLException ex) {
             ex.printStackTrace();
-        }finally{
-            TableTransport.close(rs,conn);
+        } finally {
+            TableTransport.close(rs, conn);
         }
         return list;
     }
@@ -787,21 +819,21 @@ public class TableTransport {
      * @param oriDatasource
      * @param tableName
      */
-    public TableInfo initTable(String oriDatasource,String schema,String tableName) throws SQLException {
+    public TableInfo initTable(String oriDatasource, String schema, String tableName) throws SQLException {
 
-        TableInfo tableInfo = this.getTable(oriDatasource,schema,tableName);
-        if(tableInfo == null){
+        TableInfo tableInfo = this.getTable(oriDatasource, schema, tableName);
+        if (tableInfo == null) {
             log.error("找不到表:talbename = " + tableName);
             return tableInfo;
         }
-        log.info("开始加载表["+tableName+"]主键信息");
-        tableInfo.setPrimaryKeyList(getPrimaryKeysInfo(oriDatasource,tableInfo.getSECHEMA(),tableInfo.getTABLE_NAME()));
+        log.info("开始加载表[" + tableName + "]主键信息");
+        tableInfo.setPrimaryKeyList(getPrimaryKeysInfo(oriDatasource, tableInfo.getSECHEMA(), tableInfo.getTABLE_NAME()));
 
-        log.info("开始加载表["+tableName+"]索引信息");
-        tableInfo.setIndexInfoList(getIndexInfo(oriDatasource,tableInfo.getSECHEMA(),tableInfo.getTABLE_NAME()));
+        log.info("开始加载表[" + tableName + "]索引信息");
+        tableInfo.setIndexInfoList(getIndexInfo(oriDatasource, tableInfo.getSECHEMA(), tableInfo.getTABLE_NAME()));
 
-        log.info("开始加载表["+tableName+"]列信息");
-        tableInfo.setColumnInfoList(getColumnsInfo(oriDatasource,tableInfo.getSECHEMA(),tableInfo.getTABLE_NAME()));
+        log.info("开始加载表[" + tableName + "]列信息");
+        tableInfo.setColumnInfoList(getColumnsInfo(oriDatasource, tableInfo.getSECHEMA(), tableInfo.getTABLE_NAME()));
 
         return tableInfo;
     }
@@ -811,8 +843,8 @@ public class TableTransport {
      * @param targetDatasource
      * @param tableInfo
      */
-    public void copyTableToMySql(String targetDatasource , TableInfo tableInfo){
-        sql.execute(targetDatasource,tableInfo);
+    public void copyTableToMySql(String targetDatasource, TableInfo tableInfo) {
+        sql.execute(targetDatasource, tableInfo);
     }
 
 
@@ -824,14 +856,14 @@ public class TableTransport {
      * @throws SQLException
      */
     public String getDbName(String datasource) throws SQLException {
-        String dbProductName =  null;
-        Connection conn =  this.getConnection(datasource);
-        try{
+        String dbProductName = null;
+        Connection conn = this.getConnection(datasource);
+        try {
             dbProductName = conn.getMetaData().getDatabaseProductName();
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
-            log.error(e.getMessage(),e);
-        }finally{
+            log.error(e.getMessage(), e);
+        } finally {
             TableTransport.close(conn);
         }
         return dbProductName;

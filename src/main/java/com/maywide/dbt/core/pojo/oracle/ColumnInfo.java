@@ -1,21 +1,21 @@
 package com.maywide.dbt.core.pojo.oracle;
 
 public class ColumnInfo {
-    private String TABLE_CAT ;//表类别（可能为空）
+    private String TABLE_CAT;//表类别（可能为空）
     private String TABLE_SCHEM;//表模式（可能为空）,在oracle中获取的是命名空间,其它数据库未知
     private String TABLE_NAME; //表名
 
     private String COLUMN_NAME;  //列名
-    private int DATA_TYPE ; //对应的java.sql.Types的SQL类型(列类型ID)
+    private int DATA_TYPE; //对应的java.sql.Types的SQL类型(列类型ID)
 
-    private  String TYPE_NAME;  //java.sql.Types类型名称(列类型名称)
+    private String TYPE_NAME;  //java.sql.Types类型名称(列类型名称)
     private int COLUMN_SIZE;  //列大小
     private int DECIMAL_DIGITS;  //小数位数
     private int NUM_PREC_RADIX;  //基数（通常是10或2） --未知
     /**
-     *  0 (columnNoNulls) - 该列不允许为空
-     *  1 (columnNullable) - 该列允许为空
-     *  2 (columnNullableUnknown) - 不确定该列是否为空
+     * 0 (columnNoNulls) - 该列不允许为空
+     * 1 (columnNullable) - 该列允许为空
+     * 2 (columnNullableUnknown) - 不确定该列是否为空
      */
     private int NULLABLE;  //是否允许为null
     private String REMARKS;  //列描述

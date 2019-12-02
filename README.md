@@ -21,4 +21,6 @@ oracle jar包问题,maven 可能加载不下oracle的jar包，需要的需要自
    复制表结构：
       路径：http://127.0.0.1:9999/transport/table?schema=AUTH&table=BMS_GROUP
    传输表数据：
-      路径： http://127.0.0.1:9999/transport/data?schema=AUTH&table=BMS_GROUP
+      路径： http://127.0.0.1:9999/transport/data?schema=AUTH&table=BMS_USER&isDelete=false
+      指定表进行数据迁移
+      http://127.0.0.1:9999/transport/selectedData?schema=AUTH&table=BMS_USER&user=auth

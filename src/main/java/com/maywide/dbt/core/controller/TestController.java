@@ -13,12 +13,12 @@ public class TestController {
     private TestServices testServices;
 
     @RequestMapping("/one")
-    public String testOne(){
+    public String testOne() {
         return testServices.testOneService();
     }
 
     @RequestMapping("/insert")
-    public String testIn (){
+    public String testIn() {
         testServices.testInsert();
         return "";
     }

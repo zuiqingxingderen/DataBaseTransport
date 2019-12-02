@@ -12,10 +12,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 //@Import({DynamicDataSource.class})
 public class Application {
 
-	private static final Logger log = LoggerFactory.getLogger(Application.class);
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
-		new Thread(new Runnable() {
+    private static final Logger log = LoggerFactory.getLogger(Application.class);
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+		/*new Thread(new Runnable() {
 			@Override
 			public void run() {
 				while (true){
@@ -29,7 +30,6 @@ public class Application {
 				}
 			}
 		}){
-		}.start();;
-
-	}
+		}.start();*/
+    }
 }

@@ -3,8 +3,8 @@ package com.maywide.dbt.core.pojo.oracle;
 import java.util.List;
 
 public class TableInfo {
-    private String TABLE_NAME ;
-    private String TABLE_TYPE ;
+    private String TABLE_NAME;
+    private String TABLE_TYPE;
     private String REMARKS;
     private String SECHEMA;
 
@@ -79,35 +79,35 @@ public class TableInfo {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
 
-        StringBuffer sb = new StringBuffer("\n *************表{"+TABLE_NAME+"} 信息 ***************\n");
-        sb.append("表{"+TABLE_NAME+"} 类型 {"+TABLE_TYPE+"} 备注{"+REMARKS+"} \n")
+        StringBuffer sb = new StringBuffer("\n *************表{" + TABLE_NAME + "} 信息 ***************\n");
+        sb.append("表{" + TABLE_NAME + "} 类型 {" + TABLE_TYPE + "} 备注{" + REMARKS + "} \n")
                 .append(" ----------列信息 ------------\n ");
-        if(columnInfoList!=null && !columnInfoList.isEmpty()){
+        if (columnInfoList != null && !columnInfoList.isEmpty()) {
             for (ColumnInfo columnInfo : columnInfoList) {
-                sb.append("列名 {"+ columnInfo.getCOLUMN_NAME()+"}, 类型{" + columnInfo.getTYPE_NAME()+"} ," +
-                        " 长度 {"+columnInfo.getCOLUMN_SIZE()+"} , 小数精度{"+columnInfo.getDECIMAL_DIGITS()+"} ," +
-                        " 是否为null{" + columnInfo.getNULLABLE()+"}, 备注{"+ columnInfo.getREMARKS()+"} ,默认值{" +columnInfo.getCOLUMN_DEF()+"} \n");
+                sb.append("列名 {" + columnInfo.getCOLUMN_NAME() + "}, 类型{" + columnInfo.getTYPE_NAME() + "} ," +
+                        " 长度 {" + columnInfo.getCOLUMN_SIZE() + "} , 小数精度{" + columnInfo.getDECIMAL_DIGITS() + "} ," +
+                        " 是否为null{" + columnInfo.getNULLABLE() + "}, 备注{" + columnInfo.getREMARKS() + "} ,默认值{" + columnInfo.getCOLUMN_DEF() + "} \n");
 
             }
         }
         sb.append("  ----------索引信息 ------------\n");
-        if(indexInfoList!=null && !indexInfoList.isEmpty()){
+        if (indexInfoList != null && !indexInfoList.isEmpty()) {
             for (IndexInfo index : indexInfoList) {
-                sb.append("索引名 {"+ index.getINDEX_NAME()+"}, 列名{" + index.getCOLUMN_NAME()+"} ,是否为空{"+index.isNON_UNIQUE()+"} \n" );
+                sb.append("索引名 {" + index.getINDEX_NAME() + "}, 列名{" + index.getCOLUMN_NAME() + "} ,是否为空{" + index.isNON_UNIQUE() + "} \n");
             }
         }
         sb.append(" ----------主键信息 ------------\n");
-        if(primaryKeyList!=null && !primaryKeyList.isEmpty()){
+        if (primaryKeyList != null && !primaryKeyList.isEmpty()) {
             for (PrimaryKey pk : primaryKeyList) {
-                sb.append("主键 {"+pk.getPK_NAME()+"}, 列名{" + pk.getCOLUMN_NAME()+"} ,序列号{"+pk.getKEY_SEQ()+"} \n" );
+                sb.append("主键 {" + pk.getPK_NAME() + "}, 列名{" + pk.getCOLUMN_NAME() + "} ,序列号{" + pk.getKEY_SEQ() + "} \n");
             }
         }
 
         sb.append(" ----------序列信息 ------------\n");
-        if(sequenceInfo != null){
-            sb.append(" 序列名:{"+sequenceInfo.getColumn()+"},下一个值{"+sequenceInfo.getMaxValue()+"}");
+        if (sequenceInfo != null) {
+            sb.append(" 序列名:{" + sequenceInfo.getColumn() + "},下一个值{" + sequenceInfo.getMaxValue() + "}");
         }
 
         return sb.toString();
